@@ -1,0 +1,53 @@
+'''
+Citation for Images Used
+playerImg: https://www.pinterest.com/pin/721631540269147334/
+cat images: Self drawn, but referenced https://www.pixtastock.com/illustration/77286806
+homeImg: Created by me on Canva
+catalogImg: Created by me on Canva
+blank: Created by me on Canva
+'''
+
+#Imports
+from cmu_112_graphics import * 
+from classes import *
+from mazeGeneration import *
+from homeScreen import * 
+from mazeScreen import * 
+from endScreen import *
+from catalogScreen import *
+from usefulFunctions import *
+  
+# Modes idea from Animations Part IV: https://www.cs.cmu.edu/~112/notes/notes-animations-part4.html
+
+def appStarted(app):
+    app.testMaze = Maze(10, 10)
+    app.testMaze.depthFirstSearch() 
+    # app.testMaze.prims()
+    # app.testMaze.kruskal()  
+    
+    # User can input their name here
+    app.username = app.getUserInput("Welcome! What's your name?").lower()
+    app.mode ='homeMode' 
+
+    #Check ability to capture cats
+    app.ableToCaptureCat = False
+
+    app.homeImg = ImageTk.PhotoImage(app.loadImage("screens/homeScreen.png"))
+    app.blankImg = ImageTk.PhotoImage(app.loadImage("screens/blank.png"))
+    app.catalogImg = ImageTk.PhotoImage(app.loadImage("screens/catalogScreen.png"))
+
+    # Setting player and cat images 
+    playerImg = ImageTk.PhotoImage(app.scaleImage(app.loadImage("images/player.png"),1/10))
+    
+    app.player = Player("boy", 100 , 100, playerImg)  
+
+    cat1Img = ImageTk.PhotoImage(app.scaleImage(app.loadImage("images/cat1.png"),1/10))
+    cat2Img = ImageTk.PhotoImage(app.scaleImage(app.loadImage("images/cat2.png"),1/10))
+    cat3Img = ImageTk.PhotoImage(app.scaleImage(app.loadImage("images/cat3.png"),1/10))
+    cat4Img = ImageTk.PhotoImage(app.scaleImage(app.loadImage("images/cat4.png"),1/10))
+    # app.catImgs = [cat1Img, cat2Img, cat3Img, cat4Img]
+
+    app.cat1 = Cat("1", 150, 100, cat1Img)  
+ 
+ 
+runApp(width=600, height=600)  
