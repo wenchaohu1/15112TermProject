@@ -12,16 +12,16 @@ from cmu_112_graphics import *
 from classes import *
 from mazeGeneration import *
 from homeScreen import * 
-from mazeScreen import * 
-from endScreen import *
+from mazeScreen import *  
 from catalogScreen import *
 from usefulFunctions import *
+
   
 # Modes idea from Animations Part IV: https://www.cs.cmu.edu/~112/notes/notes-animations-part4.html
 
 def appStarted(app):
-    app.testMaze = Maze(10, 10)
-    app.testMaze.depthFirstSearch() 
+    app.maze = Maze(10, 10)
+    app.maze.depthFirstSearch() 
     # app.testMaze.prims()
     # app.testMaze.kruskal()  
     
@@ -37,9 +37,9 @@ def appStarted(app):
     app.catalogImg = ImageTk.PhotoImage(app.loadImage("screens/catalogScreen.png"))
 
     # Setting player and cat images 
-    playerImg = ImageTk.PhotoImage(app.scaleImage(app.loadImage("images/player.png"),1/10))
-    
-    app.player = Player("boy", 100 , 100, playerImg)  
+    app.playerImg = ImageTk.PhotoImage(app.scaleImage(app.loadImage("images/player.png"),1/10))
+    # app.spriteImg = "images/player.png"
+    app.player = Player("boy", 100 , 100, app.playerImg)  
 
     cat1Img = ImageTk.PhotoImage(app.scaleImage(app.loadImage("images/cat1.png"),1/10))
     cat2Img = ImageTk.PhotoImage(app.scaleImage(app.loadImage("images/cat2.png"),1/10))
@@ -47,7 +47,25 @@ def appStarted(app):
     cat4Img = ImageTk.PhotoImage(app.scaleImage(app.loadImage("images/cat4.png"),1/10))
     # app.catImgs = [cat1Img, cat2Img, cat3Img, cat4Img]
 
-    app.cat1 = Cat("1", 150, 100, cat1Img)  
- 
+    app.cat1 = Cat("1", 150, 100, cat1Img)   
+
+    #Sprite
+    app.spriteCounter = 0  
+
+    app.spritestrip = app.loadImage('images/forwardPlayer.png') 
+
+    # Width & height from YT tutorial on sprites using PIL:
+    # https://www.youtube.com/watch?v=X4Fe04BfTDk&t=166s 
+    width, height = app.spritestrip.size 
+    print(width, height)
+
+    app.sprites = [ ]
+    for i in range(4):
+        sprite = app.spritestrip.crop((309 * i,0, 309 + 309 * i, height))
+        app.sprites.append(sprite)
+
+def timerFired(app):
+    # Frames of sprite
+    app.spriteCounter = (1 + app.spriteCounter) % len(app.sprites)
  
 runApp(width=600, height=600)  
