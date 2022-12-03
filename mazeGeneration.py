@@ -6,6 +6,36 @@ import random
 #https://en.wikipedia.org/wiki/Maze_generation_algorithm
     #got idea for DFS, Prims, Kruskal's
 
+#Node class, stores all the nodes location and its neighbors
+class Node():
+
+    def __init__(self, location): 
+        self.location = location 
+        #Initialize empty set of neighbors
+        self.neighbors = set()  
+
+    def __hash__(self):
+        return hash(self.location)
+
+    #Method to get the neightbor nodes
+    def getNeighbors(self):
+        return self.neighbors
+
+    #Method of add neighbors to "other"
+    def mutualAddNeighbors(self, other):
+        self.neighbors.add(other)
+        other.neighbors.add(self)
+
+    # Lotto helped me with this part
+    def drawMaze(self, canvas, other, margin, convertToCoords): 
+        # print(self.location)
+        xSelf, ySelf = convertToCoords(self.location)
+        xOther, yOther = convertToCoords(other.location) 
+
+        x0, y0, x1, y1 = xSelf-margin, ySelf-margin, xOther, yOther
+        canvas.create_rectangle(x0, y0, x1, y1, fill='black')
+         
+
 class Maze:   
     def __init__(self, rows, cols):
         #Initialize rows and cols
@@ -15,27 +45,24 @@ class Maze:
         #Set the dimensions of the board
         #Idea from https://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
         self.margin = 50
-        self.cellSize = 50  
+        self.cellSize = 50
         self.gridWidth = self.cols * self.cellSize
         self.gridHeight = self.rows * self.cellSize
      
         #Initialize the list of nodes by appending to the empty list 
-        self.nodes = []
-        for i in range(cols):
-            #For each column, multiply by length of row
-            temp = [0]*rows  
-            #Append the new row list of nodes
-            self.nodes.append(temp) 
+        self.nodes = [[0]*rows for col in range(cols)] 
 
         #Initialize how wide the path is
-        self.pathWidth = 10 
+        self.pathWidth = 10
+
+        self.walls = [] 
       
     #Method to create the nodes from cell
     def createNodes(self):
         #Iterate through every grid position and add it as a node
         for i in range(self.rows):
             for j in range(self.cols):  
-                self.nodes[i][j] = Node((i, j)) 
+                self.nodes[i][j] = Node((i, j))  
     
     #Inspired from https://www.cs.cmu.edu/~112/notes/notes-animations-part2.html 
     #Check if the next move is within the defined grid dimensions
@@ -59,6 +86,7 @@ class Maze:
     def depthFirstSearchHelper(self, currentCell, visitedNodes):
         #For each cell, add to visited set
         visitedNodes.add(currentCell)
+        
 
         #CurrentCell stores the coordinate points of cell location
         #Row, zeroth index. Col, first index. 
@@ -85,9 +113,10 @@ class Maze:
             #Backtracking: if the helper does not yield result,
             #              reset the neighbor nodes to original row and col
             neighborNodes = self.getUnvisitedNeighbors(visitedNodes,row, col) 
+            
     
     def getUnvisitedNeighbors(self, visited, row, col):
-        #initlize empty list
+        #initialize empty list
         result = []
 
         #possible directions (up,down,left,right)
@@ -99,58 +128,52 @@ class Maze:
             if self.isInGrid(drow+row, dcol+col):
                 #Check if the new point has been visited
                 #If has been visited, pass
-                if (drow+row, dcol+col) in visited:
+                if (drow+row, dcol+col) in visited: 
                     pass
                 #Else, add new point to unvisited result
                 else:
                     result.append((drow+row, dcol+col))
+                    
+                    
         return result  
 
     #from https://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
     def getCellBounds(self, location):
         row, col = location 
         x = self.margin + (col+0.5) * self.cellSize
-        y = self.margin + (row+0.5) * self.cellSize 
+        y = self.margin + (row+0.5) * self.cellSize  
         return (x, y)
-     
+
+    # ################
+    # # Where the wall is
+    # def wallBounds(self, other, margin, convertToCoords): 
+    #     xSelf, ySelf = convertToCoords(self.location)
+    #     xOther, yOther = convertToCoords(other.location) 
+    #     # print(xSelf-margin, ySelf-margin, xOther+margin, yOther+margin)
+    #     return xSelf-margin, ySelf-margin, xOther+margin, yOther+margin
+
     def redrawAll(self, canvas):
+
         #For each cell
         for row in range(self.rows):
             for col in range(self.cols):  
-
+                
                 node = self.nodes[row][col] 
-
                 #For all the neighbors in neighboring nodes
                 for neighbor in node.getNeighbors():
+                    
                     #Use drawMaze method in Node to draw the maze
                     node.drawMaze(canvas, neighbor, self.pathWidth, self.getCellBounds) 
+                    #self.walls.append((row,col))
+                    
+        
+        #Borders
+        canvas.create_rectangle(20,20, self.gridWidth + 60, 40, fill = 'black')
+        canvas.create_rectangle(20, 40, 40, self.gridHeight + 60, fill = 'black') 
+        canvas.create_rectangle(20,self.gridHeight + 60, self.gridWidth + 60, 580, fill = 'black')
+        canvas.create_rectangle(self.gridWidth + 60, 20, 580,580, fill = 'black')
 
-#Node class, stores all the nodes location and its neighbors
-class Node():
-
-    def __init__(self, location): 
-        self.location = location 
-        #Initialize empty set of neighbors
-        self.neighbors = set()  
-
-    #Method to get the neightbor nodes
-    def getNeighbors(self):
-        return self.neighbors
-
-    #Method of add neighbors to "other"
-    def mutualAddNeighbors(self, other):
-        self.neighbors.add(other)
-        other.neighbors.add(self)
-
-    # Lotto helped me with this part
-    def drawMaze(self, canvas, other, margin, convertToCoords): 
-
-        xSelf, ySelf = convertToCoords(self.location)
-        xOther, yOther = convertToCoords(other.location) 
-
-        canvas.create_rectangle(xSelf-margin, ySelf-margin, 
-                                  xOther+margin, yOther+margin, fill='black') 
-
+ 
 
 # maze = Maze(10, 10)
 # print(maze.depthFirstSearch())
